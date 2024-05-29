@@ -6,8 +6,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.document_loaders import PyPDFium2Loader
 from langchain.chains.question_answering import load_qa_chain
-# from langchain.llms import OpenAI
-from langchain.chat_models import ChatOpenAI
+from langchain.llms import OpenAI
+# from langchain.chat_models import ChatOpenAI
 
 
 class PDFQuery:
@@ -15,8 +15,8 @@ class PDFQuery:
         self.embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
         os.environ["OPENAI_API_KEY"] = openai_api_key
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-        # self.llm = OpenAI(temperature=0, openai_api_key=openai_api_key)
-        self.llm = ChatOpenAI(temperature=0, openai_api_key=openai_api_key)
+        self.llm = OpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key)
+        # self.llm = ChatOpenAI(temperature=0, openai_api_key=openai_api_key)
         self.chain = load_qa_chain(self.llm, chain_type="stuff")
         self.vectordb = Chroma(embedding_function=self.embeddings, persist_directory="./chroma_db")
         self.db = self.vectordb.as_retriever()
