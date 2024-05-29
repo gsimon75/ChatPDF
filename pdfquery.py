@@ -16,6 +16,7 @@ class PDFQuery:
         # self.llm = OpenAI(temperature=0, openai_api_key=openai_api_key)
         self.llm = ChatOpenAI(temperature=0, openai_api_key=openai_api_key)
         self.chain = None
+        self.vectordb = None
         self.db = None
 
     def ask(self, question: str) -> str:
@@ -30,9 +31,15 @@ class PDFQuery:
         loader = PyPDFium2Loader(file_path)
         documents = loader.load()
         splitted_documents = self.text_splitter.split_documents(documents)
-        self.db = Chroma.from_documents(splitted_documents, self.embeddings).as_retriever()
+        if self.db is None:
+            self.vectordb = Chroma.from_documents(splitted_documents, self.embeddings)
+            self.db = self.vectordb.as_retriever()
+        else:
+            self.vectordb.add_documents(splitted_documents)
+
         # self.chain = load_qa_chain(OpenAI(temperature=0), chain_type="stuff")
-        self.chain = load_qa_chain(ChatOpenAI(temperature=0), chain_type="stuff")
+        if self.chain is None:
+            self.chain = load_qa_chain(ChatOpenAI(temperature=0), chain_type="stuff")
 
     def forget(self) -> None:
         self.db = None
