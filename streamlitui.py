@@ -25,9 +25,9 @@ def process_input():
 
 
 def read_and_save_file():
-    st.session_state["pdfquery"].forget()  # to reset the knowledge base
-    st.session_state["messages"] = []
-    st.session_state["user_input"] = ""
+    # st.session_state["pdfquery"].forget()  # to reset the knowledge base
+    # st.session_state["messages"] = []
+    # st.session_state["user_input"] = ""
 
     for file in st.session_state["file_uploader"]:
         with tempfile.NamedTemporaryFile(delete=False) as tf:

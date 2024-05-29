@@ -1,4 +1,6 @@
 import os
+
+from chromadb.errors import NoIndexException
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
@@ -15,31 +17,24 @@ class PDFQuery:
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         # self.llm = OpenAI(temperature=0, openai_api_key=openai_api_key)
         self.llm = ChatOpenAI(temperature=0, openai_api_key=openai_api_key)
-        self.chain = None
-        self.vectordb = None
-        self.db = None
+        self.chain = load_qa_chain(self.llm, chain_type="stuff")
+        self.vectordb = Chroma(embedding_function=self.embeddings, persist_directory="./chroma_db")
+        self.db = self.vectordb.as_retriever()
 
     def ask(self, question: str) -> str:
-        if self.chain is None:
-            response = "Please, add a document."
-        else:
+        try:
             docs = self.db.get_relevant_documents(question)
             response = self.chain.run(input_documents=docs, question=question)
+        except NoIndexException:
+            response = "Please, add a document."
+
         return response
 
     def ingest(self, file_path: os.PathLike) -> None:
         loader = PyPDFium2Loader(file_path)
         documents = loader.load()
         splitted_documents = self.text_splitter.split_documents(documents)
-        if self.db is None:
-            self.vectordb = Chroma.from_documents(splitted_documents, self.embeddings)
-            self.db = self.vectordb.as_retriever()
-        else:
-            self.vectordb.add_documents(splitted_documents)
-
-        # self.chain = load_qa_chain(OpenAI(temperature=0), chain_type="stuff")
-        if self.chain is None:
-            self.chain = load_qa_chain(ChatOpenAI(temperature=0), chain_type="stuff")
+        self.vectordb.add_documents(splitted_documents)
 
     def forget(self) -> None:
         self.db = None
