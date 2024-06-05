@@ -35,7 +35,7 @@ def read_and_save_file():
             file_path = tf.name
 
         with st.session_state["ingestion_spinner"], st.spinner(f"Ingesting {file.name}"):
-            st.session_state["pdfquery"].ingest(file_path)
+            st.session_state["pdfquery"].ingest(file_path, file)
         os.remove(file_path)
 
 
@@ -68,7 +68,7 @@ def main():
 
     st.subheader("Upload a document")
     st.file_uploader(
-        "Upload document",
+        label="Upload document",
         type=["pdf"],
         key="file_uploader",
         on_change=read_and_save_file,
