@@ -2,6 +2,5 @@ chromadb
 duckdb
 langchain-community
 langchain-openai
-pdfminer.six
 pypdfium2
 streamlit-chat

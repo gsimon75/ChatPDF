@@ -2,13 +2,11 @@ import os
 
 # from chromadb.errors import NoIndexException
 from langchain_core.prompts import PromptTemplate, format_document
-from langchain.chains import LLMChain  # deprecated
 from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores.chroma import Chroma
 from langchain_community.document_loaders import PyPDFium2Loader
-from langchain.chains.combine_documents.stuff import StuffDocumentsChain
-from langchain_community.llms import OpenAIChat
+# from langchain_community.llms import OpenAIChat
 from langchain_core.runnables import RunnableLambda, RunnableConfig
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from pydantic import BaseModel, Field
@@ -21,7 +19,7 @@ class DocumentTag(BaseModel):
 
 
 class PDFQuery:
-    def __init__(self, openai_api_key = None) -> None:
+    def __init__(self, openai_api_key=None) -> None:
         os.environ["OPENAI_API_KEY"] = openai_api_key
 
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
@@ -47,7 +45,7 @@ class PDFQuery:
             return {
                 "question": config["metadata"]["question"],
                 "context": "\n\n".join(
-                    [ format_document(doc, document_prompt) for doc in docs ]
+                    [format_document(doc, document_prompt) for doc in docs]
                 )
             }
 
@@ -65,7 +63,7 @@ class PDFQuery:
                         partial_variables={},
                         template="""
 Use the following pieces of context to answer the users question.
-If you don"t know the answer, just say that you don"t know, don"t try to make up an answer.
+If you don't know the answer, just say that you don't know, don't try to make up an answer.
 ----------------
 {context}""",
                         template_format="f-string",
@@ -108,14 +106,14 @@ If you don"t know the answer, just say that you don"t know, don"t try to make up
         )
         return response.content
 
-    def ingest(self, file_path: os.PathLike, file: UploadedFile) -> None:
+    def ingest(self, file_path: str, file: UploadedFile) -> None:
         loader = PyPDFium2Loader(file_path)
         documents = loader.load()
         for doc in documents:
             doc.metadata["source_name"] = file.name
             doc.metadata["source_type"] = file.type
-        splitted_documents = self.text_splitter.split_documents(documents)
-        self.vectordb.add_documents(splitted_documents)
+        split_documents = self.text_splitter.split_documents(documents)
+        self.vectordb.add_documents(split_documents)
         # self.vectordb.persist()  # deprecated
 
     def forget(self) -> None:
