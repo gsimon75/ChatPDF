@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 # from chromadb.errors import NoIndexException
 from langchain_core.prompts import PromptTemplate, format_document
@@ -29,12 +30,16 @@ class PDFQuery:
         db_retriever = self.vectordb.as_retriever()
 
         document_prompt = PromptTemplate(
-            input_variables=["page_content"],
+            input_variables=["page_content", "metadata"],
+            input_types={
+                "page_content": str,
+                "metadata": dict[str, Any],
+            },
             output_parser=None,
             partial_variables={},
-            template="{page_content}",
+            template="{source_name}: {page_content}",  # NOTE: all variables except for `page_content` are resolved from metadata
             template_format="f-string",
-            validate_template=True
+            validate_template=False  # https://github.com/langchain-ai/langchain/issues/22668
         )
 
         def f_stuff_documents(docs, config: RunnableConfig):
