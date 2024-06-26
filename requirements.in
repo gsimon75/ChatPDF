@@ -1,4 +1,5 @@
-chromadb
+# chromadb
+pinecone
 duckdb
 langchain-community
 langchain-openai
