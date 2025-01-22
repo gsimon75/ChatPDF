@@ -1,7 +1,8 @@
 # chromadb
-pinecone
+pinecone==4.0.0
 duckdb
-langchain-community
-langchain-openai
+langchain-community==0.2.3
+langchain-openai==0.1.8
 pypdfium2
 streamlit-chat
+langchain_pinecone==0.1.1
