@@ -63,7 +63,7 @@ def main():
     st.text_input("Message", key="user_input", disabled=False, on_change=process_input)
 
     st.divider()
-    st.markdown("Source code: [Github](https://github.com/Anil-matcha/ChatPDF)")
+    st.markdown("Source code: [Github](https://github.com/gsimon75/ChatPDF)")
 
 
 if __name__ == "__main__":
